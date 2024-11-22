@@ -1,12 +1,15 @@
-﻿namespace Markdown;
+﻿using Markdown.Parsers;
+using Markdown.Renderers;
+
+namespace Markdown;
 
 public class Md
 {
-    private HashSet<string> tags = ["_", "__"];
-    private HashSet<string> specialTags = ["[", "]"];
-    
     public string Render(string markdown)
     {
-        throw new NotImplementedException();
+        var markdownWithoutEscapes = EscapeHandler.GetMarkdownWithoutEscapes(markdown);
+        var tokens = ParserMd.Parse(markdownWithoutEscapes);
+        var htmlContent = HtmlRenderer.RenderHtml(tokens);
+        return htmlContent;
     }
 }

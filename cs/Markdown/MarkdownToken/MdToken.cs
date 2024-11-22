@@ -1,4 +1,4 @@
-namespace Markdown.Token;
+namespace Markdown.MarkdownToken;
 
 public class MdToken(MdTokenType mdType, string content, List<MdToken>? children = null)
 {

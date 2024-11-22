@@ -1,4 +1,4 @@
-namespace Markdown.Token;
+namespace Markdown.MarkdownToken;
 
 public enum MdTokenType
 {
