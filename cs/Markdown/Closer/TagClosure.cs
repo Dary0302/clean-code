@@ -93,7 +93,7 @@ public class TagClosure(Dictionary<string, Tag> tagSigns)
             }
             else
             {
-                enclosedToken.MdType = tagSigns[enclosedToken.Value];
+                enclosedToken.Tag = tagSigns[enclosedToken.Value];
                 skip = enclosedToken.End - enclosedToken.Start - 1;
                 result.Add(enclosedToken);
             }
@@ -103,13 +103,13 @@ public class TagClosure(Dictionary<string, Tag> tagSigns)
     }
 
     private static bool IsTag(IEnumerable<Token> tokens, string tagString, string sign) =>
-        tagString == sign && !tokens.Any(token => token.Type != TokenType.Tag);
+        tagString == sign && tokens.All(token => token.Type == TokenType.Tag);
 
     private static bool IsOpeningTag(IEnumerable<Token> tokens) =>
-        !tokens.Any(token => token.TagPosition != TagPosition.Opening);
+        tokens.All(token => token.TagPosition == TagPosition.Opening);
 
     private static bool IsClosingTag(IEnumerable<Token> tokens, ICollection closing) =>
-        closing.Count != 0 && !tokens.Any(token => token.TagPosition != TagPosition.Closure);
+        closing.Count != 0 && tokens.All(token => token.TagPosition == TagPosition.Closure);
 
     private static void SetVacantPlaces(
         IList<bool> vacant,
@@ -124,7 +124,7 @@ public class TagClosure(Dictionary<string, Tag> tagSigns)
             }
             else
             {
-                closerTokens[i] = initialTokens[i] as TagClosureToken;
+                closerTokens[i] = new TagClosureToken();
             }
         }
     }

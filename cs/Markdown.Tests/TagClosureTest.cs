@@ -15,6 +15,7 @@ public class TagClosureTest
     {
         var tag1 = new Tag("_", "<em>", true);
         var tag2 = new Tag("__", "<strong>", true);
+        var tag3 = new Tag("# ", "h1", true);
         tagSigns = new() { { tag1.MdTag, tag1 }, { tag2.MdTag, tag2 } };
     }
 

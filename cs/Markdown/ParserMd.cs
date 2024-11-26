@@ -6,8 +6,6 @@ namespace Markdown;
 
 public class ParserMd(Dictionary<string, Tag> tagSigns)
 {
-    private bool previousSymbolIsScreen;
-
     public IEnumerable<Token> Parse(string text)
     {
         ArgumentNullException.ThrowIfNull(text);
@@ -15,33 +13,31 @@ public class ParserMd(Dictionary<string, Tag> tagSigns)
         var tokens = GetTokens(text);
         tokens = InspectTokensPosition(tokens);
 
-        var closer = new TagClosure(tagSigns);
-        tokens = closer.Close(tokens);
-
         return tokens;
     }
-
-    private void ScreenNext() => previousSymbolIsScreen = true;
 
     private List<Token> GetTokens(string text)
     {
         var tokens = new List<Token>();
+        var previousSymbolIsEscape = false;
+        
         foreach (var symbol in text)
         {
-            if (symbol == '\\' && !previousSymbolIsScreen)
+            if (symbol == '\\' && !previousSymbolIsEscape)
             {
-                ScreenNext();
+                previousSymbolIsEscape = true;
                 continue;
             }
-            var tokenType = GetTokenType(symbol.ToString());
+            var tokenType = GetTokenType(symbol.ToString(), previousSymbolIsEscape);
             var token = new Token(symbol.ToString(), tokenType);
             tokens.Add(token);
+            previousSymbolIsEscape = false;
         }
 
         return tokens;
     }
 
-    private TokenType GetTokenType(string symbol)
+    private TokenType GetTokenType(string symbol, bool previousSymbolIsScreen)
     {
         var result = TokenType.Text;
         switch (symbol)
@@ -61,7 +57,6 @@ public class ParserMd(Dictionary<string, Tag> tagSigns)
                     break;
                 }
         }
-        previousSymbolIsScreen = false;
 
         return result;
     }
@@ -78,11 +73,11 @@ public class ParserMd(Dictionary<string, Tag> tagSigns)
             var isEnclosing = IsTagEnclosing(i, tokens);
             tokens[i] = InspectToken(tokens[i], TagPosition.Closure, isEnclosing);
         }
-        foreach (var t in tokens)
+        foreach (var token in tokens)
         {
-            if (t.Type == TokenType.Tag && t.TagPosition == TagPosition.None)
+            if (token.Type == TokenType.Tag && token.TagPosition == TagPosition.None)
             {
-                t.Type = TokenType.Text;
+                token.Type = TokenType.Text;
             }
         }
         return tokens;
@@ -94,19 +89,22 @@ public class ParserMd(Dictionary<string, Tag> tagSigns)
         TagPosition inspectedPosition,
         bool isTokenOfInspectedPosition)
     {
-        if (token.Type == TokenType.Tag && isTokenOfInspectedPosition)
+        var newToken = new Token(token);
+        
+        if (newToken.Type == TokenType.Tag && isTokenOfInspectedPosition)
         {
-            token.MdType = tagSigns[token.Value];
-            token.TagPosition = inspectedPosition;
+            newToken.Tag = tagSigns[newToken.Value];
+            newToken.TagPosition = inspectedPosition;
         }
-        return token;
+        
+        return newToken;
     }
 
     private static bool IsTagOpening(int index, IList<Token> tokens) =>
-        index == 0 || tokens[index - 1].Type == TokenType.WhiteSpace
+        index == 0 || tokens[index - 1].Type == TokenType.WhiteSpace || tokens[index - 1].Type == TokenType.Text
         || tokens[index - 1].TagPosition == TagPosition.Opening;
 
     private static bool IsTagEnclosing(int index, IList<Token> tokens) =>
-        index == tokens.Count - 1 || tokens[index + 1].Type == TokenType.WhiteSpace
+        index == tokens.Count - 1 || tokens[index + 1].Type == TokenType.WhiteSpace || tokens[index + 1].Type == TokenType.Text
         || tokens[index + 1].TagPosition == TagPosition.Closure;
 }
