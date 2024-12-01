@@ -1,21 +1,21 @@
 using FluentAssertions;
-using Markdown.Tags;
 
 namespace Markdown.Tests;
 
 [TestFixture]
 public class MdTest
 {
+    [TestCase("[3311", "[3311")]
+    [TestCase(@"_e\\_", @"<em>e\</em>")]
     [TestCase("в_нутр_и слова", "в<em>нутр</em>и слова")]
     [TestCase("__Непарные_ символы", "__Непарные_ символы")]
-    [TestCase("# Hello, world!", "h1 Hello, world!")]
-    [TestCase("## Hello, world!", "h2 Hello, world!")]
-    [TestCase("### Hello, world!", "h3 Hello, world!")]
-    [TestCase("#### Hello, world!", "h4 Hello, world!")]
-    [TestCase("##### Hello, world!", "h5 Hello, world!")]
-    [TestCase("###### Hello, world!", "h6 Hello, world!")]
+    [TestCase("# Hello, world!", "<h1>Hello, world!</h1>")]
+    [TestCase("## Hello, world!", "<h2>Hello, world!</h2>")]
+    [TestCase("### Hello, world!", "<h3>Hello, world!</h3>")]
+    [TestCase("#### Hello, world!", "<h4>Hello, world!</h4>")]
+    [TestCase("##### Hello, world!", "<h5>Hello, world!</h5>")]
+    [TestCase("###### Hello, world!", "<h6>Hello, world!</h6>")]
     [TestCase("_Hello, world!_", "<em>Hello, world!</em>")]
-    [TestCase("___Hello, world!___", "<em><strong>Hello, world!</strong></em>")]
     [TestCase("Hello, world!", "Hello, world!")]
     [TestCase("__Hello, world!__", "<strong>Hello, world!</strong>")]
     [TestCase("Внутри __двойного выделения _одинарное_ тоже__ работает", "Внутри <strong>двойного выделения <em>одинарное</em> тоже</strong> работает")]

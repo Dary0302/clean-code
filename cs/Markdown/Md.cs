@@ -1,56 +1,33 @@
-﻿using Markdown.Closer;
-using Markdown.MarkdownToken;
-using Markdown.Tags;
+﻿using Markdown.HtmlTools;
+using Markdown.MarkdownParsers;
+using Markdown.TagInfo;
+using Markdown.TokenInfo;
 
 namespace Markdown;
 
-public class Md
+public class Md(IEnumerable<IMarkdownParser> parsers)
 {
-    private readonly Dictionary<string, Tag> tagSigns;
-    private readonly ParserMd parserMd;
-    private readonly TagClosure tagClosure;
+    public Md() : this([
+        new SingleTagParser("# ", TagType.FirstLevelHeader),
+        new SingleTagParser("## ", TagType.SecondLevelHeader),
+        new SingleTagParser("### ", TagType.ThirdLevelHeader),
+        new SingleTagParser("#### ", TagType.FourthLevelHeader),
+        new SingleTagParser("##### ", TagType.FifthLevelHeader),
+        new SingleTagParser("###### ", TagType.SixthLevelHeader),
+        new PairedTagsParser("_", TagType.Italic),
+        new PairedTagsParser("__", TagType.Strong),
+        new EscapedCharactersParser(),
+    ]) { }
 
-    public Md()
+    public string Render(string markdownText)
     {
-        tagSigns = new Dictionary<string, Tag>();
-        AddTagsToTagSigns();
-        parserMd = new ParserMd(tagSigns);
-        tagClosure = new TagClosure(tagSigns);
-    }
+        var tokens = new List<Token>();
 
-    public string Render(string text)
-    {
-        ArgumentNullException.ThrowIfNull(text);
+        foreach (var parser in parsers)
+        {
+            tokens.AddRange(parser.Parse(markdownText));
+        }
 
-        var tokens = parserMd.Parse(text).ToList();
-        tokens = tagClosure.Close(tokens);
-        var result = GetTokenInterpretation(tokens);
-
-        return string.Join(string.Empty, result);
+        return HtmlHandler.Handle(markdownText, tokens);
     }
-
-    private void AddTagsToTagSigns()
-    {
-        AddTag(new Tag("#", "h1", false));
-        AddTag(new Tag("##", "h2", false));
-        AddTag(new Tag("###", "h3", false));
-        AddTag(new Tag("####", "h4", false));
-        AddTag(new Tag("#####", "h5", false));
-        AddTag(new Tag("######", "h6", false));
-        AddTag(new Tag("_", "<em>", true));
-        AddTag(new Tag("__", "<strong>", true));
-    }
-
-    private void AddTag(Tag tag)
-    {
-        tagSigns.Add(tag.MdTag, tag);
-    }
-    
-    public static IEnumerable<string> GetTokenInterpretation(IEnumerable<Token> tokens)
-    {
-        return tokens.Select(token => token.Type == TokenType.Tag && token.IsClosed ? RenderHtmlTag(token) : token.Value);
-    }
-    
-    private static string RenderHtmlTag(Token token) =>
-        token.TagPosition == TagPosition.Opening ? token.Tag.HtmlTag : token.Tag.HtmlTagClose;
 }
