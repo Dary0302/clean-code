@@ -12,7 +12,7 @@ public class PairedTagsParserTest
     {
         var text = string.Empty;
 
-        var result = new PairedTagsParser("_", TagType.Italic).Parse(text);
+        var result = new PairedTagsParser("_", Tag.Italic).Parse(text);
 
         result.Should().BeEmpty();
     }
@@ -22,7 +22,7 @@ public class PairedTagsParserTest
     {
         var text = "without tags";
 
-        var result = new PairedTagsParser("_", TagType.Italic).Parse(text);
+        var result = new PairedTagsParser("_", Tag.Italic).Parse(text);
 
         result.Should().BeEmpty();
     }
@@ -33,10 +33,10 @@ public class PairedTagsParserTest
     [TestCase("he_llohe_llo")]
     public void Parse_WithItalicTags(string text)
     {
-        var result = new PairedTagsParser("_", TagType.Italic).Parse(text);
+        var result = new PairedTagsParser("_", Tag.Italic).Parse(text);
 
         result.Should().HaveCount(2);
-        result.Should().OnlyContain(token => token.TagType == TagType.Italic);
+        result.Should().OnlyContain(token => token.Tag == Tag.Italic);
     }
 
     [TestCase(@"a\_b_c")]
@@ -44,7 +44,7 @@ public class PairedTagsParserTest
     [TestCase(@"a_b\_c")]
     public void Parse_WithEscapedTags_ShouldNotParsed(string text)
     {
-        var result = new PairedTagsParser("_", TagType.Italic).Parse(text);
+        var result = new PairedTagsParser("_", Tag.Italic).Parse(text);
 
         result.Should().BeEmpty();
     }
@@ -54,10 +54,10 @@ public class PairedTagsParserTest
     [TestCase(@"_a\\_")]
     public void Parse_WithEscapedEscape(string text)
     {
-        var result = new PairedTagsParser("_", TagType.Italic).Parse(text);
+        var result = new PairedTagsParser("_", Tag.Italic).Parse(text);
 
         result.Should().HaveCount(2);
-        result.Should().OnlyContain(token => token.TagType == TagType.Italic);
+        result.Should().OnlyContain(token => token.Tag == Tag.Italic);
     }
 
     [Test]
@@ -65,17 +65,17 @@ public class PairedTagsParserTest
     {
         var text = "a_b_c_d_";
 
-        var result = new PairedTagsParser("_", TagType.Italic).Parse(text);
+        var result = new PairedTagsParser("_", Tag.Italic).Parse(text);
 
         result.Should().HaveCount(4);
-        result.Should().OnlyContain(token => token.TagType == TagType.Italic);
+        result.Should().OnlyContain(token => token.Tag == Tag.Italic);
     }
 
     [TestCase("a_ b_")]
     [TestCase("_a _b")]
     public void Parse_TagsWithSpace_ReturnsEmpty(string text)
     {
-        var result = new PairedTagsParser("_", TagType.Italic).Parse(text);
+        var result = new PairedTagsParser("_", Tag.Italic).Parse(text);
 
         result.Should().BeEmpty();
     }

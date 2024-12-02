@@ -1,14 +1,14 @@
-﻿using Markdown.HtmlTools;
-using Markdown.TagInfo;
+﻿using Markdown.TagInfo;
 using Markdown.TokenInfo;
+using Markdown.HtmlTools;
 
 namespace Markdown.MarkdownParsers;
 
 public class EscapedCharactersParser : IMarkdownParser
 {
     private const int TagLength = 1;
-    private const TagType TagType = TagInfo.TagType.Empty;
-    private readonly char[] escapedChars = new char[] { '_', '#', '\\' };
+    private const Tag Tag = TagInfo.Tag.Empty;
+    private readonly char[] escapedChars = ['_', '#', '\\'];
 
     public IEnumerable<Token> Parse(string text)
     {
@@ -33,8 +33,8 @@ public class EscapedCharactersParser : IMarkdownParser
         }
     }
 
-    private static Token BuildEscapeTag(int i)
+    private static Token BuildEscapeTag(int escapedCharPosition)
     {
-        return new Token(TagType, i - 1, Tag.Open, TagLength);
+        return new Token(Tag, escapedCharPosition - 1, TagType.Open, TagLength);
     }
 }

@@ -1,4 +1,4 @@
-﻿using static Markdown.MarkdownParsers.PairedTagsParser;
+﻿using Markdown.CandidateInfo;
 
 namespace Markdown.HtmlTools;
 
@@ -66,14 +66,14 @@ public static class Checks
             return false;
         }
 
-        if (open.EdgeType == EdgeType.Edge || close.EdgeType == EdgeType.Edge)
+        if (open.EdgeType == EdgeType.Edge && close.EdgeType == EdgeType.Edge)
         {
             return true;
         }
 
         var oneWord = content.Split(' ').Length == 1;
 
-        return !isContentWithDigits && oneWord;
+        return oneWord;
     }
 
     private static bool IsContentWithDigits(string word) => word.Any(char.IsDigit);

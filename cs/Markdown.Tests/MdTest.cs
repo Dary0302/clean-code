@@ -5,6 +5,13 @@ namespace Markdown.Tests;
 [TestFixture]
 public class MdTest
 {
+    [TestCase("\\__это не курсив__", "__это не курсив__")]
+    [TestCase("\\__это__ курсив", "_<em>это</em>_ курсив")]
+    [TestCase("в ра_зных\tсл_овах", "в ра_зных\tсл_овах")]
+    [TestCase("в ра_зных\nсл_овах", "в ра_зных\nсл_овах")]
+    [TestCase("_в разных сл_овах", "_в разных сл_овах")]
+    [TestCase("_Кажется, вот\nэто_ не выполняется", "_Кажется, вот\nэто_ не выполняется")]
+    [TestCase("[text](link)", "<a href=link>text</a>")]
     [TestCase("[3311", "[3311")]
     [TestCase(@"_e\\_", @"<em>e\</em>")]
     [TestCase("в_нутр_и слова", "в<em>нутр</em>и слова")]

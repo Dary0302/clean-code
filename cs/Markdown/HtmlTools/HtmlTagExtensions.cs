@@ -4,16 +4,16 @@ namespace Markdown.HtmlTools;
 
 public static class HtmlTagExtensions
 {
-    public static string GetHtmlOpenTag(this TagType tag) => tag switch
+    public static string GetHtmlOpenTag(this Tag tag) => tag switch
     {
-        TagType.FirstLevelHeader => "<h1>",
-        TagType.SecondLevelHeader => "<h2>",
-        TagType.ThirdLevelHeader => "<h3>",
-        TagType.FourthLevelHeader => "<h4>",
-        TagType.FifthLevelHeader => "<h5>",
-        TagType.SixthLevelHeader => "<h6>",
-        TagType.Italic => "<em>",
-        TagType.Strong => "<strong>",
+        Tag.FirstLevelHeader => "<h1>",
+        Tag.SecondLevelHeader => "<h2>",
+        Tag.ThirdLevelHeader => "<h3>",
+        Tag.FourthLevelHeader => "<h4>",
+        Tag.FifthLevelHeader => "<h5>",
+        Tag.SixthLevelHeader => "<h6>",
+        Tag.Italic => "<em>",
+        Tag.Strong => "<strong>",
         var _ => ""
     };
 }

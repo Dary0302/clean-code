@@ -2,11 +2,11 @@
 
 namespace Markdown.TokenInfo;
 
-public static class TokensHandler
+public static class TokensAccordanceWithRules
 {
-    private static readonly Dictionary<TagType, List<TagType>> DisallowedNesting = new()
+    private static readonly Dictionary<Tag, List<Tag>> DisallowedNesting = new()
     {
-        { TagType.Italic, [TagType.Strong] },
+        { Tag.Italic, [Tag.Strong] }, { Tag.Link, [Tag.Strong, Tag.Italic, Tag.Link] }
     };
 
     public static IEnumerable<Token> Handle(IEnumerable<Token> tokens)
@@ -16,11 +16,11 @@ public static class TokensHandler
 
         foreach (var token in tokens.OrderBy(x => x.Position))
         {
-            if (token.TagType == TagType.Empty)
+            if (token.Tag == Tag.Empty)
             {
                 selected.Add(token);
             }
-            else if (token.Tag == Tag.Open)
+            else if (token.TagType == TagType.Open)
             {
                 stack.Push(token);
             }
@@ -37,17 +37,17 @@ public static class TokensHandler
 
     private static bool IsAllowedNesting(Token parent, Token nested)
     {
-        if (parent.TagType == TagType.Empty)
+        if (parent.Tag == Tag.Empty)
         {
             return true;
         }
 
-        if (!DisallowedNesting.TryGetValue(parent.TagType, out var disallowed))
+        if (!DisallowedNesting.TryGetValue(parent.Tag, out var disallowed))
         {
             return true;
         }
 
-        return !disallowed.Contains(nested.TagType);
+        return !disallowed.Contains(nested.Tag);
     }
 
     private static (Token, Token) TryGetPair(Stack<Token> opened, Token closing)
@@ -59,7 +59,7 @@ public static class TokensHandler
 
         var opening = opened.Pop();
 
-        if (opening.TagType != closing.TagType)
+        if (opening.Tag != closing.Tag)
         {
             return (null, null)!;
         }

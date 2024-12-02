@@ -3,7 +3,7 @@ using Markdown.TokenInfo;
 
 namespace Markdown.MarkdownParsers;
 
-public class SingleTagParser(string tag, TagType type) : IMarkdownParser
+public class SingleTagParser(string tag, Tag type1) : IMarkdownParser
 {
     private const int CloseTagLength = 0;
     private readonly int openTagLength = tag.Length;
@@ -38,9 +38,9 @@ public class SingleTagParser(string tag, TagType type) : IMarkdownParser
 
     private Token CreateSingleTagToken(int position, bool isOpeningTag)
     {
-        return new Token(type,
+        return new Token(type1,
             position,
-            isOpeningTag ? Tag.Open : Tag.Close,
+            isOpeningTag ? TagType.Open : TagType.Close,
             isOpeningTag ? openTagLength : CloseTagLength);
     }
 }

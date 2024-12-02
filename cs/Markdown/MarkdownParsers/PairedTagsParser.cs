@@ -1,10 +1,11 @@
-﻿using Markdown.HtmlTools;
-using Markdown.TagInfo;
+﻿using Markdown.TagInfo;
 using Markdown.TokenInfo;
+using Markdown.HtmlTools;
+using Markdown.CandidateInfo;
 
 namespace Markdown.MarkdownParsers;
 
-public class PairedTagsParser(string tag, TagType type) : IMarkdownParser
+public class PairedTagsParser(string tag, Tag tagType) : IMarkdownParser
 {
     private readonly int tagLength = tag.Length;
 
@@ -16,7 +17,7 @@ public class PairedTagsParser(string tag, TagType type) : IMarkdownParser
 
         do
         {
-            var foundTagIndex = IndexOfFirstUnescapedTag(text, startIndex);
+            var foundTagIndex = GetIndexOfFirstUnescapedTag(text, startIndex);
 
             if (foundTagIndex == -1)
             {
@@ -28,26 +29,28 @@ public class PairedTagsParser(string tag, TagType type) : IMarkdownParser
         }
         while (startIndex < text.Length);
 
-        return tokens;
+        return tokens.FindAll(token => token != null);
     }
 
-    private int IndexOfFirstUnescapedTag(string text, int startIndex)
+    private int GetIndexOfFirstUnescapedTag(string text, int startIndex)
     {
-        var firstTagStartIndex = text.IndexOf(tag, startIndex, StringComparison.Ordinal);
-
-        if (firstTagStartIndex == -1)
+        while (true)
         {
-            return -1;
+            var firstTagStartIndex = text.IndexOf(tag, startIndex, StringComparison.Ordinal);
+
+            if (firstTagStartIndex == -1)
+            {
+                return -1;
+            }
+
+            if (Checks.IsEscaped(text, firstTagStartIndex))
+            {
+                startIndex++;
+                continue;
+            }
+
+            return firstTagStartIndex;
         }
-
-        var next = text.IndexOf(tag, firstTagStartIndex + tagLength, StringComparison.Ordinal);
-
-        if (Checks.IsEscaped(text, firstTagStartIndex) || (next != -1 && next - firstTagStartIndex == tagLength))
-        {
-            return IndexOfFirstUnescapedTag(text, firstTagStartIndex + tagLength + 1);
-        }
-
-        return firstTagStartIndex;
     }
 
     private void HandleFoundTagAtIndex(int position, string text, Stack<Candidate> openedTags, List<Token> tokens)
@@ -60,7 +63,7 @@ public class PairedTagsParser(string tag, TagType type) : IMarkdownParser
                 : GetOpeningTagState(text, position)
         };
 
-        if (candidate.EdgeType == EdgeType.Bad)
+        if (candidate.EdgeType == EdgeType.NotSuitable)
         {
             return;
         }
@@ -71,7 +74,9 @@ public class PairedTagsParser(string tag, TagType type) : IMarkdownParser
 
             if (candidate.Position - opened.Position - tagLength > 0)
             {
-                tokens.AddRange(TryCreateTagsPair(text, opened, candidate));
+                var (open, close) = TryCreateTagsPair(text, opened, candidate);
+                tokens.Add(open);
+                tokens.Add(close);
             }
         }
         else
@@ -80,25 +85,23 @@ public class PairedTagsParser(string tag, TagType type) : IMarkdownParser
         }
     }
 
-    private List<Token> TryCreateTagsPair(string text, Candidate open, Candidate close)
+    private (Token, Token) TryCreateTagsPair(string text, Candidate open, Candidate close)
     {
         if (Checks.CanSelect(text, open, close))
         {
             return
-            [
-                new Token(type, open.Position, Tag.Open, tagLength),
-                new Token(type, close.Position, Tag.Close, tagLength)
-            ];
+                (new Token(tagType, open.Position, TagType.Open, tagLength),
+                    new Token(tagType, close.Position, TagType.Close, tagLength));
         }
 
-        return [];
+        return (null, null)!;
     }
 
     private static EdgeType GetOpeningTagState(string text, int position)
     {
         if (Checks.IsBeforeSpace(text, position))
         {
-            return EdgeType.Bad;
+            return EdgeType.NotSuitable;
         }
 
         if (Checks.IsAfterSpace(text, position))
@@ -109,31 +112,18 @@ public class PairedTagsParser(string tag, TagType type) : IMarkdownParser
         return EdgeType.Middle;
     }
 
-    private static EdgeType GetClosingTagState(string text, int position)
+    private EdgeType GetClosingTagState(string text, int position)
     {
         if (Checks.IsAfterSpace(text, position))
         {
-            return EdgeType.Bad;
+            return EdgeType.NotSuitable;
         }
 
-        if (Checks.IsBeforeSpace(text, position))
+        if (Checks.IsBeforeSpace(text, position + tag.Length - 1))
         {
             return EdgeType.Edge;
         }
 
         return EdgeType.Middle;
-    }
-
-    public struct Candidate
-    {
-        public int Position;
-        public EdgeType EdgeType;
-    }
-
-    public enum EdgeType
-    {
-        Bad,
-        Edge,
-        Middle
     }
 }

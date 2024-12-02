@@ -2,6 +2,14 @@ namespace Markdown.TagInfo;
 
 public enum Tag
 {
-    Open,
-    Close
+    FirstLevelHeader,
+    SecondLevelHeader,
+    ThirdLevelHeader,
+    FourthLevelHeader,
+    FifthLevelHeader,
+    SixthLevelHeader,
+    Italic,
+    Strong,
+    Link,
+    Empty
 }
