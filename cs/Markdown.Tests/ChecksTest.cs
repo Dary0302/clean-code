@@ -1,7 +1,6 @@
 using FluentAssertions;
 using Markdown.CandidateInfo;
 using Markdown.HtmlTools;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 namespace Markdown.Tests;
 
