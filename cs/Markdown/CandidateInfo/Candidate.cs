@@ -1,6 +1,6 @@
 namespace Markdown.CandidateInfo;
 
-public struct Candidate
+internal struct Candidate
 {
     public int Position;
     public EdgeType EdgeType;

@@ -2,7 +2,7 @@
 
 namespace Markdown.HtmlTools;
 
-public static class HtmlTagExtensions
+internal static class HtmlTagExtensions
 {
     public static string GetHtmlOpenTag(this Tag tag) => tag switch
     {

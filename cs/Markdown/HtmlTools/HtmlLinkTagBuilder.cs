@@ -1,19 +1,19 @@
 ﻿namespace Markdown.HtmlTools;
 
-public static class HtmlLinkTagBuilder
+internal static class HtmlLinkTagBuilder
 {
     public static string Build(string linkMarkdown)
     {
-        var split = linkMarkdown.IndexOf(']');
+        var indexDividesLabelAndLink = linkMarkdown.IndexOf(']');
 
-        if (split <= 0)
+        if (indexDividesLabelAndLink <= 0)
         {
             return "";
         }
 
-        var startIndex = split + 2;
-        var link = linkMarkdown.Substring(startIndex, linkMarkdown.Length - startIndex - 1);
-        var label = linkMarkdown[1..split];
+        var indexWhereLinkStarts = indexDividesLabelAndLink + 2;
+        var link = linkMarkdown.Substring(indexWhereLinkStarts, linkMarkdown.Length - indexWhereLinkStarts - 1);
+        var label = linkMarkdown[1..indexDividesLabelAndLink];
 
         return $"<a href={link}>{label}</a>";
     }

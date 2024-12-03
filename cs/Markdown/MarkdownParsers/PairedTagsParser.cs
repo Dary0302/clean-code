@@ -5,7 +5,7 @@ using Markdown.CandidateInfo;
 
 namespace Markdown.MarkdownParsers;
 
-public class PairedTagsParser(string tag, Tag tagType) : IMarkdownParser
+internal class PairedTagsParser(string tag, Tag tagType) : IMarkdownParser
 {
     private readonly int tagLength = tag.Length;
 

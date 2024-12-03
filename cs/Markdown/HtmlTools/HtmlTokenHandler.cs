@@ -4,7 +4,7 @@ using Markdown.TokenInfo;
 
 namespace Markdown.HtmlTools;
 
-public static class HtmlTokenHandler
+internal static class HtmlTokenHandler
 {
     public static string Handle(string inputText, IEnumerable<Token> tokens)
     {

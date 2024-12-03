@@ -4,7 +4,7 @@ using Markdown.HtmlTools;
 
 namespace Markdown.MarkdownParsers;
 
-public class EscapedCharactersParser : IMarkdownParser
+internal class EscapedCharactersParser : IMarkdownParser
 {
     private const int TagLength = 1;
     private const Tag Tag = TagInfo.Tag.Empty;

@@ -2,7 +2,7 @@
 
 namespace Markdown.HtmlTools;
 
-public static class Checks
+internal static class Checks
 {
     private const char EscapeChar = '\\';
 

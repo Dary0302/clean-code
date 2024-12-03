@@ -3,7 +3,7 @@ using Markdown.TokenInfo;
 
 namespace Markdown.MarkdownParsers;
 
-public class LinkTagParser : IMarkdownParser
+internal class LinkTagParser : IMarkdownParser
 {
     private const Tag TagType = Tag.Link;
 

@@ -2,7 +2,7 @@
 
 namespace Markdown.TokenInfo;
 
-public static class TokensAccordanceWithRules
+internal static class TokensAccordanceWithRules
 {
     private static readonly Dictionary<Tag, List<Tag>> DisallowedNesting = new()
     {

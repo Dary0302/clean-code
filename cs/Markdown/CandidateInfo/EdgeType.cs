@@ -1,6 +1,6 @@
 namespace Markdown.CandidateInfo;
 
-public enum EdgeType
+internal enum EdgeType
 {
     NotSuitable,
     Edge,
